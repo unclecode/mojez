@@ -1,5 +1,5 @@
 // src/components/TextEditor.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,6 +19,11 @@ export default function TextEditor({ initialText = "", initialResults = [], onSa
     const [results, setResults] = useState(initialResults);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
+
+    // Use useEffect to update inputText when initialText changes
+    useEffect(() => {
+        setInputText(initialText);
+    }, [initialText]);
 
     const handleGenerate = async () => {
         setIsLoading(true);
@@ -81,7 +86,7 @@ export default function TextEditor({ initialText = "", initialResults = [], onSa
     const handleShare = async (text: string) => {
         if (navigator.share) {
             try {
-                await navigator.share({ url: "", text: text, title: "Condensed Message" });
+                await navigator.share({ url: "", text: text, title: "" });
                 toast({ title: "Shared successfully" });
             } catch (error) {
                 console.error("Error sharing:", error);
@@ -96,7 +101,8 @@ export default function TextEditor({ initialText = "", initialResults = [], onSa
             // iOS PWA specific sharing
             window.webkit.messageHandlers.share.postMessage({
                 text: text,
-                url: window.location.href,
+                url: "",
+                title: "",
             });
         } else {
             fallbackShare(text);

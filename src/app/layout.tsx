@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Toaster } from "@/components/ui/toaster";
 import { Home, Settings, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import "./globals.css";
 
@@ -36,6 +36,7 @@ declare global {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
+    const router = useRouter();
     const hideHeaderRoutes = ["/new", "/settings", "/edit"];
     const shouldHideHeader = hideHeaderRoutes.some((route) => pathname.startsWith(route));
 
@@ -53,12 +54,36 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 },
             };
         }
+
+        if (typeof window !== "undefined") {
+            window.addEventListener("webcontentshared", function (e) {
+                if (e.detail.file) {
+                    //doSomethingWithTheFile(e.detail.file);
+                } else if (e.detail.url) {
+                    //doSomethingWithTheLink(e.detail.url, e.detail.title, e.detail.text);
+                } else {
+                    // Navigate to new page and add the text to the input
+                    const sharedText = e.detail.text || "";
+                    router.push(`/new?initialText=${encodeURIComponent(sharedText)}`);
+                }
+            });
+        }
     }, []);
+
+    // Function to simulate webcontentshared event
+    const simulateWebContentShared = () => {
+        const event = new CustomEvent("webcontentshared", {
+            detail: {
+                text: "This is a test shared text from browser simulation.",
+            },
+        });
+        window.dispatchEvent(event);
+    };
 
     return (
         <html lang="en">
             <head>
-                <link rel="manifest" href="/manifest.json" />
+                {/* <link rel="manifest" href="/manifest.json" /> */}
                 <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
                 <meta
                     name="viewport"
@@ -66,6 +91,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 />
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+                <link rel="manifest" href="https://progressier.app/KgH57BZHZkXp04nVVeAd/progressier.json" />
+                <script defer src="https://progressier.app/KgH57BZHZkXp04nVVeAd/script.js"></script>
                 <style>{`
                     html, body {
                         touch-action: pan-x pan-y;
@@ -92,16 +119,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {!shouldHideHeader && (
                     <header className="sticky top-0 z-10 bg-gray-900 border-b border-gray-800 p-4">
                         <div className="flex justify-between items-center max-w-2xl mx-auto">
-                            <h1 className="text-2xl font-semibold text-gray-400">Mojez</h1>
-                            <Link href="/new">
+                            <h1 className="text-2xl font-semibold text-gray-400">Mojez 1.0</h1>
+                            <div className="flex items-center">
                                 <Button
                                     variant="ghost"
-                                    size="icon"
-                                    className="text-gray-400 hover:text-gray-200 hover:bg-gray-800 active:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                                    size="sm"
+                                    onClick={simulateWebContentShared}
+                                    className="mr-2 text-gray-400 hover:text-gray-200 hover:bg-gray-800"
                                 >
-                                    <Plus size={24} />
+                                    Test Share
                                 </Button>
-                            </Link>
+                                <Link href="/new">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-gray-400 hover:text-gray-200 hover:bg-gray-800 active:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                                    >
+                                        <Plus size={24} />
+                                    </Button>
+                                </Link>
+                            </div>
                         </div>
                     </header>
                 )}

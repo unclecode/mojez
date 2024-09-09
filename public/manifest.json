@@ -4,8 +4,8 @@
     "description": "Condense your text with AI",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#111827",
-    "theme_color": "#111827",
+    "background_color": "#121929",
+    "theme_color": "#121929",
     "icons": [
       {
         "src": "/icons/icon-256x256.png",
